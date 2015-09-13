@@ -5,7 +5,7 @@ from ._cozip import cozip
 from ._emptycoroutine import emptycoroutine
 
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 __all__ = [
