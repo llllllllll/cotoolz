@@ -1,31 +1,32 @@
 #!/usr/bin/env python
-from setuptools import setup, Extension, find_packages
-import sys
+from setuptools import setup, Extension
 
-long_description = ''
 
-if 'upload' in sys.argv:
-    with open('README.rst') as f:
-        long_description = f.read()
+with open('README.rst') as f:
+    long_description = f.read()
 
 setup(
     name='cotoolz',
-    version='0.1.1',
+    version='0.1.2',
     description='A set of utility functions for coroutines.',
     author='Joe Jevnik',
     author_email='joejev@gmail.com',
-    packages=find_packages(),
+    packages=['cotoolz'],
     include_package_data=True,
     long_description=long_description,
     license='GPL-2',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'Intended Audience :: Developers',
         'Natural Language :: English',
         'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
         'Operating System :: POSIX',
         'Topic :: Software Development',
+        'Topic :: Utilities',
     ],
     url='https://github.com/llllllllll/cotoolz',
     ext_modules=[

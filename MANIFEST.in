@@ -1,0 +1,7 @@
+recursive-include cotoolz *.py
+recursive-include cotoolz *.h
+
+include setup.py
+include README.rst
+include LICENSE
+include MANIFEST.in
