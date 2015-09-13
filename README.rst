@@ -1,6 +1,8 @@
 ``cotoolz 0.1``
 ===============
 
+|build status|
+
 A set of utility functions for coroutines.
 
 Example
@@ -34,3 +36,6 @@ Dependencies
 
 ``cotoolz`` depends on CPython 3 and some means of compiling C99.
 We recommend using ``gcc`` to compile ``cotoolz``.
+
+.. |build status| image:: https://travis-ci.org/llllllllll/cotoolz.svg?branch=master
+   :target: https://travis-ci.org/llllllllll/cotoolz
