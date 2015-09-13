@@ -130,6 +130,7 @@ cozip_send(cozip *cz, PyObject *value)
                 goto error;
             }
             if (Py_REFCNT(argtuple) != 1) {
+                Py_DECREF(argtuple);
                 if (!(argtuple = PyTuple_Pack(1, value))) {
                     goto error;
                 }
@@ -148,6 +149,7 @@ cozip_send(cozip *cz, PyObject *value)
                 goto error;
             }
             if (Py_REFCNT(argtuple) != 1) {
+                Py_DECREF(argtuple);
                 if (!(argtuple = PyTuple_Pack(1, value))) {
                     goto error;
                 }
