@@ -73,42 +73,6 @@ coiter_new(PyTypeObject *cls, PyObject *args, PyObject *kwargs)
 }
 
 PyObject *
-PyCoiter_Send(PyObject *ci, PyObject *value)
-{
-    static PyObject * volatile cached_args = NULL;
-    PyObject *args;
-    PyObject * ret;
-
-    if (!PyCoiter_Check(ci)) {
-        PyErr_BadInternalCall();
-        return NULL;
-    }
-    args = cached_args;
-    if (!args || Py_REFCNT(args) != 1) {
-        Py_CLEAR(cached_args);
-        if (!(cached_args = args = PyTuple_New(1)))
-            return NULL;
-    }
-    Py_INCREF(args);
-    assert (Py_REFCNT(args) == 2);
-    Py_INCREF(value);
-    PyTuple_SET_ITEM(args, 0, value);
-    ret = PyObject_Call(((coiter*) ci)->ci_send, args, NULL);
-    if (args == cached_args) {
-        if (Py_REFCNT(args) == 2) {
-            value = PyTuple_GET_ITEM(args, 0);
-            PyTuple_SET_ITEM(args, 0, NULL);
-            Py_XDECREF(value);
-        }
-        else {
-            Py_CLEAR(cached_args);
-        }
-    }
-    Py_DECREF(args);
-    return ret;
-}
-
-PyObject *
 PyCoiter_Throw(PyObject *ci, PyObject *excinfo)
 {
     if (!PyCoiter_Check(ci)) {
@@ -165,9 +129,51 @@ coiter_dealloc(coiter *self)
 }
 
 static PyObject *
-coiter_iternext(PyObject *self)
+coiter_send(coiter *self, PyObject *value)
 {
-    return PyCoiter_Send(self, Py_None);
+    static PyObject * volatile cached_args = NULL;
+    PyObject *args;
+    PyObject * ret;
+
+    args = cached_args;
+    if (!args || Py_REFCNT(args) != 1) {
+        Py_CLEAR(cached_args);
+        if (!(cached_args = args = PyTuple_New(1)))
+            return NULL;
+    }
+    Py_INCREF(args);
+    assert (Py_REFCNT(args) == 2);
+    Py_INCREF(value);
+    PyTuple_SET_ITEM(args, 0, value);
+    ret = PyObject_Call(((coiter*) self)->ci_send, args, NULL);
+    if (args == cached_args) {
+        if (Py_REFCNT(args) == 2) {
+            value = PyTuple_GET_ITEM(args, 0);
+            PyTuple_SET_ITEM(args, 0, NULL);
+            Py_XDECREF(value);
+        }
+        else {
+            Py_CLEAR(cached_args);
+        }
+    }
+    Py_DECREF(args);
+    return ret;
+}
+
+PyObject *
+PyCoiter_Send(PyObject *ci, PyObject *value)
+{
+    if (!PyCoiter_Check(ci)) {
+        PyErr_BadInternalCall();
+        return NULL;
+    }
+    return coiter_send((coiter*) ci, value);
+}
+
+static PyObject *
+coiter_iternext(coiter *self)
+{
+    return coiter_send(self, Py_None);
 }
 
 PyDoc_STRVAR(coiter__send_doc,
