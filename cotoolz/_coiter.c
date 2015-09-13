@@ -1,8 +1,8 @@
 #include <Python.h>
 #include <structmember.h>
 
-#include "coiter.h"
-#include "emptycoroutine.h"
+#include "cotoolz/coiter.h"
+#include "cotoolz/emptycoroutine.h"
 
 static PyObject *
 inner_coiter_new(PyTypeObject *cls, PyObject *it)

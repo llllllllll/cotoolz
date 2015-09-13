@@ -2,8 +2,8 @@
 
 #include <Python.h>
 
-#include "coiter.h"
-#include "cozip.h"
+#include "cotoolz/coiter.h"
+#include "cotoolz/cozip.h"
 
 static PyObject *
 inner_cozip_new(PyTypeObject *cls, Py_ssize_t tuplesize, PyObject *args)

@@ -1,6 +1,6 @@
 #include <Python.h>
 
-#include "emptycoroutine.h"
+#include "cotoolz/emptycoroutine.h"
 
 void _ctz_set_exc_from_tuple(PyObject *args)
 {

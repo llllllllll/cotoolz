@@ -2,8 +2,8 @@
 
 #include <Python.h>
 
-#include "coiter.h"
-#include "comap.h"
+#include "cotoolz/coiter.h"
+#include "cotoolz/comap.h"
 
 static PyObject *
 inner_comap_new(PyTypeObject *cls, Py_ssize_t n, PyObject *args)
