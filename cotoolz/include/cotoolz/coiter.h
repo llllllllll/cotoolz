@@ -28,13 +28,55 @@ PyTypeObject PyCoiter_Type;
  */
 PyObject *PyCoiter_New(PyObject *it);
 
+/* Send a value into a coiter.
+ *
+ * Paramaters
+ * ----------
+ * value : any
+ *     The value to send in, if this is not wrapping a coroutine
+ *     then the value is ignored.
+ *
+ * Returns
+ * -------
+ * y : any
+ *     A new reference to the next yielded value.
+ *
+ * Raises
+ * ------
+ * StopIteration
+ *     When there are no more values in the inner iterator.
+ */
 PyObject *PyCoiter_Send(PyObject *ci, PyObject *value);
 
+/* Throw an exception into a coroutine.
+ *
+ * Paramaters
+ * ----------
+ * exc : Exception
+ *     The exception to raise.
+ * -OR-
+ * type : Exception class
+ *     The type of exception to raise.
+ * arg : any
+ *     The argument to ``type``.
+ * tb : traceback
+ *     The traceback to raise the exception with.
+ *
+ * Raises
+ * ------
+ * exc
+ *     The exception that was passed in if not caught.
+ * PyObject *PyCoiter_Throw(PyObject *ci, PyObject *excinfo);
+ */
 PyObject *PyCoiter_Throw(PyObject *ci, PyObject *excinfo);
 
+/* Close a coiter.
+ *
+ * This closes the inner data.
+ */
 void PyCoiter_Close(PyObject *ci);
 
-/* Internal user ----------------------------------------------------------- */
+/* Internal use ------------------------------------------------------------- */
 
 /* build and set and exception out of an excinfo tuple.
  *
