@@ -7,7 +7,7 @@ with open('README.rst') as f:
 
 setup(
     name='cotoolz',
-    version='0.1.4',
+    version='0.1.5',
     description='A set of utility functions for coroutines.',
     author='Joe Jevnik',
     author_email='joejev@gmail.com',
@@ -59,6 +59,9 @@ setup(
             ],
             include_dirs=['cotoolz/include'],
         ),
+    ],
+    install_requires=[
+        'toolz>=0.7.2',
     ],
     extras_require={
         'dev': [
