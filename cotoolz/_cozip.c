@@ -5,6 +5,8 @@
 #include "cotoolz/coiter.h"
 #include "cotoolz/cozip.h"
 
+PyCoiter_Exported *PyCoiter_API;
+
 static PyObject *
 inner_cozip_new(PyTypeObject *cls, Py_ssize_t tuplesize, PyObject *args)
 {
@@ -18,7 +20,7 @@ inner_cozip_new(PyTypeObject *cls, Py_ssize_t tuplesize, PyObject *args)
         return NULL;
     }
     for (n = 0;n < tuplesize;++n) {
-        if (!(cr = PyCoiter_New(PyTuple_GET_ITEM(args, n)))) {
+        if (!(cr = PyCoiter_API->new(PyTuple_GET_ITEM(args, n)))) {
             if (PyErr_ExceptionMatches(PyExc_TypeError))
                 PyErr_Format(PyExc_TypeError,
                              "cozip argument #%zd must support iteration",
@@ -303,14 +305,15 @@ cozip_close(cozip *self, PyObject *_)
     Py_RETURN_NONE;
 }
 
-void
+int
 PyCozip_Close(PyObject *cz)
 {
     if (!PyCozip_Check(cz)) {
         PyErr_BadInternalCall();
-        return NULL;
+        return 1;
     }
     Py_XDECREF(cozip_close((cozip*) cz, NULL));
+    return 0;
 }
 
 static PyMethodDef cozip_methods[] = {
@@ -395,10 +398,19 @@ static struct PyModuleDef _cozip_module = {
     NULL
 };
 
+static PyCozip_Exported exported_symbols = {
+    PyCozip_New,
+    PyCozip_Send,
+    PyCozip_Throw,
+    PyCozip_Close,
+};
+
 PyMODINIT_FUNC
 PyInit__cozip(void)
 {
     PyObject *m;
+    PyObject *symbols;
+    int err;
 
     /* Assert that our custom cozip struct definition is the same as
      * the zipobject struct.
@@ -408,9 +420,30 @@ PyInit__cozip(void)
     if (PyType_Ready(&PyCozip_Type)) {
         return NULL;
     }
-    if (!(m = PyModule_Create(&_cozip_module))) {
+
+    if (!(PyCoiter_API =
+          PyCapsule_Import("cotoolz._coiter._exported_symbols", 0))) {
         return NULL;
     }
+
+    if (!(symbols = PyCapsule_New(&exported_symbols,
+                                  "cotoolz._cozip._exported_symbols",
+                                  NULL))) {
+        return NULL;
+    }
+
+    if (!(m = PyModule_Create(&_cozip_module))) {
+        Py_DECREF(symbols);
+        return NULL;
+    }
+
+    err = PyObject_SetAttrString(m, "_exported_symbols", symbols);
+    Py_DECREF(symbols);
+    if (err) {
+        Py_DECREF(m);
+        return NULL;
+    }
+
     if (PyObject_SetAttrString(m, "cozip", (PyObject*) &PyCozip_Type)) {
         Py_DECREF(m);
         return NULL;

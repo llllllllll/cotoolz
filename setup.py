@@ -31,32 +31,23 @@ setup(
     url='https://github.com/llllllllll/cotoolz',
     ext_modules=[
         Extension(
-            'cotoolz._emptycoroutine', [
-                'cotoolz/_emptycoroutine.c',
-            ],
+            'cotoolz._emptycoroutine',
+            ['cotoolz/_emptycoroutine.c'],
             include_dirs=['cotoolz/include'],
         ),
         Extension(
-            'cotoolz._coiter', [
-                'cotoolz/_coiter.c',
-                'cotoolz/_emptycoroutine.c',
-            ],
+            'cotoolz._coiter',
+            ['cotoolz/_coiter.c'],
             include_dirs=['cotoolz/include'],
         ),
         Extension(
-            'cotoolz._comap', [
-                'cotoolz/_comap.c',
-                'cotoolz/_coiter.c',
-                'cotoolz/_emptycoroutine.c',
-            ],
+            'cotoolz._comap',
+            ['cotoolz/_comap.c'],
             include_dirs=['cotoolz/include'],
         ),
         Extension(
-            'cotoolz._cozip', [
-                'cotoolz/_cozip.c',
-                'cotoolz/_coiter.c',
-                'cotoolz/_emptycoroutine.c',
-            ],
+            'cotoolz._cozip',
+            ['cotoolz/_cozip.c'],
             include_dirs=['cotoolz/include'],
         ),
     ],

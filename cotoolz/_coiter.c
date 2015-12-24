@@ -82,19 +82,20 @@ PyCoiter_Throw(PyObject *ci, PyObject *excinfo)
     return PyObject_Call(((coiter*) ci)->ci_throw, excinfo, NULL);
 }
 
-void
+int
 PyCoiter_Close(PyObject *ci)
 {
     static PyObject *empty = NULL;
 
     if (!PyCoiter_Check(ci)) {
         PyErr_BadInternalCall();
-        return NULL;
+        return 1;
     }
     if (!empty && !(empty = PyTuple_New(0))) {
-        return NULL;
+        return 1;
     }
     Py_DECREF(PyObject_Call(((coiter*) ci)->ci_close, empty, NULL));
+    return 0;
 }
 
 static int
@@ -374,16 +375,42 @@ static struct PyModuleDef _coiter_module = {
     NULL
 };
 
+static PyCoiter_Exported exported_symbols = {
+    PyCoiter_New,
+    PyCoiter_Send,
+    PyCoiter_Throw,
+    PyCoiter_Close,
+};
+
 PyMODINIT_FUNC
 PyInit__coiter(void)
 {
     PyObject *m;
+    PyObject *symbols;
+    int err;
+
     if (PyType_Ready(&PyCoiter_Type)) {
         return NULL;
     }
-    if (!(m = PyModule_Create(&_coiter_module))) {
+
+    if (!(symbols = PyCapsule_New(&exported_symbols,
+                                  "cotoolz._coiter._exported_symbols",
+                                  NULL))) {
         return NULL;
     }
+
+    if (!(m = PyModule_Create(&_coiter_module))) {
+        Py_DECREF(symbols);
+        return NULL;
+    }
+
+    err = PyObject_SetAttrString(m, "_exported_symbols", symbols);
+    Py_DECREF(symbols);
+    if (err) {
+        Py_DECREF(m);
+        return NULL;
+    }
+
     if (PyObject_SetAttrString(m, "coiter", (PyObject*) &PyCoiter_Type)) {
         Py_DECREF(m);
         return NULL;

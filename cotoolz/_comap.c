@@ -5,6 +5,8 @@
 #include "cotoolz/coiter.h"
 #include "cotoolz/comap.h"
 
+PyCoiter_Exported *PyCoiter_API;
+
 static PyObject *
 inner_comap_new(PyTypeObject *cls, Py_ssize_t n, PyObject *args)
 {
@@ -19,7 +21,7 @@ inner_comap_new(PyTypeObject *cls, Py_ssize_t n, PyObject *args)
     }
 
     for (;n > 0;--n) {
-        if (!(cr = PyCoiter_New(PyTuple_GET_ITEM(args, n)))) {
+        if (!(cr = PyCoiter_API->new(PyTuple_GET_ITEM(args, n)))) {
             Py_DECREF(crs);
             return NULL;
         }
@@ -267,14 +269,15 @@ comap_close(comap *self, PyObject *_)
     Py_RETURN_NONE;
 }
 
-void
+int
 PyComap_Close(PyObject *cm)
 {
     if (!PyComap_Check(cm)) {
         PyErr_BadInternalCall();
-        return NULL;
+        return 1;
     }
     Py_XDECREF(comap_close((comap*) cm, NULL));
+    return 0;
 }
 
 static PyMethodDef comap_methods[] = {
@@ -350,6 +353,14 @@ PyTypeObject PyComap_Type = {
 
 PyDoc_STRVAR(module_doc, "comap is a map that acts on coroutines.");
 
+
+static PyComap_Exported exported_symbols = {
+  PyComap_New,
+  PyComap_Send,
+  PyComap_Throw,
+  PyComap_Close,
+};
+
 static struct PyModuleDef _comap_module = {
     PyModuleDef_HEAD_INIT,
     "cotoolz._comap",
@@ -366,6 +377,8 @@ PyMODINIT_FUNC
 PyInit__comap(void)
 {
     PyObject *m;
+    PyObject *symbols;
+    int err;
 
     /* Assert that our custom comap struct definition is the same as
      * the mapobject struct.
@@ -375,9 +388,30 @@ PyInit__comap(void)
     if (PyType_Ready(&PyComap_Type)) {
         return NULL;
     }
-    if (!(m = PyModule_Create(&_comap_module))) {
+
+    if (!(PyCoiter_API =
+          PyCapsule_Import("cotoolz._coiter._exported_symbols", 0))) {
         return NULL;
     }
+
+    if (!(symbols = PyCapsule_New(&exported_symbols,
+                                  "cotoolz._comap._exported_symbols",
+                                  NULL))) {
+        return NULL;
+    }
+
+    if (!(m = PyModule_Create(&_comap_module))) {
+        Py_DECREF(symbols);
+        return NULL;
+    }
+
+    err = PyObject_SetAttrString(m, "_exported_symbols", symbols);
+    Py_DECREF(symbols);
+    if (err) {
+        Py_DECREF(m);
+        return NULL;
+    }
+
     if (PyObject_SetAttrString(m, "comap", (PyObject*) &PyComap_Type)) {
         Py_DECREF(m);
         return NULL;
