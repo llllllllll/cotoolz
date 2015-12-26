@@ -393,6 +393,10 @@ PyInit__coiter(void)
         return NULL;
     }
 
+    if (PyEmptyCoroutine_Import()) {
+        return NULL;
+    }
+
     if (!(symbols = PyCapsule_New(&exported_symbols,
                                   "cotoolz._coiter._exported_symbols",
                                   NULL))) {
