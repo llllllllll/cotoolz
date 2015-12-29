@@ -2,7 +2,7 @@
 #define COTOOLZ_EMPTYCOROUTINE_H
 
 
-PyObject *Py_EmptyCoroutine;
+PyObject *Py_EmptyCoroutine = NULL;
 
 #define Py_RETURN_EMPTYCOROUTINE                     \
     Py_INCREF(Py_EmptyCoroutine);                    \
@@ -24,9 +24,9 @@ PyEmptyCoroutine_Import(void)
     if (!(m = PyImport_ImportModule("cotoolz._emptycoroutine"))) {
         return 1;
     }
-    Py_EmptyCoroutine = PyObject_GetAttrString(m, "EmptyCoroutine");
+    Py_EmptyCoroutine = PyObject_GetAttrString(m, "emptycoroutine");
     Py_DECREF(m);
-    return Py_EmptyCoroutine != NULL;
+    return !Py_EmptyCoroutine;
 }
 
 void _ctz_set_exc_from_tuple(PyObject *args)

@@ -120,7 +120,9 @@ PyInit__emptycoroutine(void)
     if (!(m = PyModule_Create(&_emptycoroutine_module))) {
         return NULL;
     }
-    if (PyObject_SetAttrString(m, "emptycoroutine", Py_EmptyCoroutine)) {
+    if (PyObject_SetAttrString(m,
+                               "emptycoroutine",
+                               &_Py_EmptyCoroutineObject)) {
         Py_DECREF(m);
         return NULL;
     }
