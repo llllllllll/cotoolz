@@ -24,7 +24,7 @@ PyEmptyCoroutine_Import(void)
     if (!(m = PyImport_ImportModule("cotoolz._emptycoroutine"))) {
         return 1;
     }
-    Py_EmptyCoroutine = PyObject_GetAttrString(m, "emptycoroutine");
+    Py_EmptyCoroutine = PyObject_GetAttrString(m, "EmptyCoroutine");
     Py_DECREF(m);
     return Py_EmptyCoroutine != NULL;
 }
