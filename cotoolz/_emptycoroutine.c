@@ -2,33 +2,6 @@
 
 #include "cotoolz/emptycoroutine.h"
 
-void _ctz_set_exc_from_tuple(PyObject *args)
-{
-    PyObject *type;
-    PyObject *value = NULL;
-    PyObject *tb = NULL;
-
-    if (!PyArg_ParseTuple(args, "O|OO:throw", &type, &value, &tb)) {
-        return;
-    }
-
-    if (PyObject_IsInstance(type, (PyObject*) PyExc_Exception)) {
-        if (value) {
-            PyErr_SetString(PyExc_TypeError,
-                            "throw either takes an exception instance or"
-                            " type, value, tb");
-            return;
-        }
-        PyErr_SetObject((PyObject*) Py_TYPE(type), type);
-        return NULL;
-    }
-    PyErr_NormalizeException(&type, &value, &tb);
-    if (tb) {
-        PyException_SetTraceback(value, tb);
-    }
-    PyErr_Restore(type, value, tb);
-}
-
 static PyObject *
 emptycoroutine_iternext(PyObject *self)
 {
