@@ -1,4 +1,5 @@
-from toolz.functoolz import curry, known_numargs
+from toolz.functoolz import curry
+from toolz._signatures import module_info, create_signature_registry
 
 from ._coiter import coiter
 from ._comap import comap
@@ -15,7 +16,10 @@ __all__ = [
     'get_include',
 ]
 
+module_info['cotoolz._comap'] = {
+    'comap': [lambda func, coroutine, *coroutines: None],
+}
+create_signature_registry()
 
-known_numargs[comap] = 2
 comap = curry(comap)
-del curry, known_numargs
+del curry, module_info, create_signature_registry
